@@ -1,0 +1,58 @@
+{
+  "ground": {
+    "id": "ground",
+    "spritesheet_path": "data/graphics/spritesheet/ground.png",
+    "resize": true,
+    "scale": 2,
+    "autotile_config": "data/configs/autotile/ground_autotile_config.json"
+  },
+  "pillar": {
+    "id": "pillar",
+    "spritesheet_path": "data/graphics/spritesheet/pillar.png",
+    "resize": true,
+    "scale": 4,
+    "autotile_config": "data/configs/autotile/pillar_autotile_config.json"
+  },
+  "decoration": {
+    "id": "decoration",
+    "spritesheet_path": "data/graphics/spritesheet/decoration.png",
+    "resize": true,
+    "scale": 2,
+    "autotile_config": null
+  },
+  "torch": {
+    "id": "torch",
+    "spritesheet_path": "data/graphics/spritesheet/torch.png",
+    "resize": true,
+    "scale": 2,
+    "autotile_config": null
+  },
+  "rock": {
+    "id": "rock",
+    "spritesheet_path": "data/graphics/spritesheet/rock.png",
+    "resize": true,
+    "scale": 2,
+    "autotile_config": "data/configs/autotile/rock_autotile_config.json"
+  },
+  "player": {
+    "id": "player",
+    "spritesheet_path": "data/graphics/spritesheet/player.png",
+    "resize": true,
+    "scale": 3,
+    "autotile_config": null
+  },
+  "demon": {
+    "id": "demon",
+    "spritesheet_path": "data/graphics/spritesheet/demon.png",
+    "resize": true,
+    "scale": 3,
+    "autotile_config": null
+  },
+  "hound": {
+    "id": "hound",
+    "spritesheet_path": "data/graphics/spritesheet/hound.png",
+    "resize": true,
+    "scale": 3,
+    "autotile_config": null
+  }
+}
