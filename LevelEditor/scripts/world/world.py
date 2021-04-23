@@ -136,20 +136,35 @@ class World:
             position = entity['position']
 
             layer = self.get_layer(layer)
-            image = load_images_from_spritesheet(f'data/graphics/spritesheet/{id}.png')[index]
+            path = f'data/graphics/spritesheet/{id}.png'
 
             try:
-                offset_data = json.load(open(f'data/configs/offsets/{id}_offset.json', 'r'))
-                offset = offset_data[str(index)]
-                offset[0] *= dimensions[0]/image.get_width()
-                offset[1] *= dimensions[1]/image.get_height()
-            except Exception as e:
-                offset = [0,0]
+                image = load_images_from_spritesheet(path)[index]
 
-            image = pygame.transform.scale(image, dimensions)
+                offset = self.load_image_offset(id, dimensions, index, image)
+
+                image = pygame.transform.scale(image, dimensions)
+            except:
+                image = pygame.image.load(path).convert()
+                image.set_colorkey((0,0,0))
+
+                offset = self.load_image_offset(id, dimensions, index, image)
+
+                image = pygame.transform.scale(image, dimensions)
 
             image_object = Image(*position, position[0]*res, position[1]*res, offset, {'image':image, 'index':index, 'id':id})
             layer.images.append(image_object)
+
+    def load_image_offset(self, id, dimensions, index, image):
+        try:
+            offset_data = json.load(open(f'data/configs/offsets/{id}_offset.json', 'r'))
+            offset = offset_data[str(index)]
+            offset[0] *= dimensions[0]/image.get_width()
+            offset[1] *= dimensions[1]/image.get_height()
+        except Exception as e:
+            offset = [0,0]
+
+        return offset
 
     def get_layer(self, n):
         for layer in self.layers:

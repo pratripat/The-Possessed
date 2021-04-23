@@ -1,0 +1,8 @@
+{
+  "instant_health": [60, 1],
+  "thorns": [120, 30],
+  "extra_speed": [120, 30],
+  "extra_damage": [120, 30],
+  "invincibility": [120, 30],
+  "invisibility": [120, 30]
+}

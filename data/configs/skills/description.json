@@ -1,0 +1,8 @@
+{
+  "instant_health": "Gives instant health to player when used",
+  "thorns": "Causes damage to whosoever damages the player",
+  "extra_speed": "Increases the speed of the player",
+  "extra_damage": "Increases the damage of the player",
+  "invincibility": "Makes the player invincible for sometime",
+  "invisibility": "Makes the player invisible for sometime"
+}

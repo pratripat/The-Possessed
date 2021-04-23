@@ -47,7 +47,8 @@ class Selector:
 
         if len(images) == 0:
             try:
-                image = pygame.image.load(self.filename)
+                image = pygame.image.load(self.filename).convert()
+                image.set_colorkey((0,0,0))
                 dimensions = self.load_image_dimensions(image)
                 offset = self.load_image_offset(image, dimensions, 0)
                 image = pygame.transform.scale(image, dimensions)
@@ -61,7 +62,7 @@ class Selector:
         for i, image in enumerate(images):
             if y > height:
                 x += res+10
-                y = 100
+                y = position
 
             dimensions = self.load_image_dimensions(image)
             offset = self.load_image_offset(image, dimensions, i)

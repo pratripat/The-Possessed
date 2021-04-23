@@ -27,17 +27,18 @@ class TileMap:
             try:
                 image = load_images_from_spritesheet(spritesheet_path)[index]
 
-                offset = self.load_image_offset(image, dimensions, index)
+                offset = self.load_image_offset(image, dimensions, id, index)
                 image = pygame.transform.scale(image, dimensions)
                 self.tiles.append({'image':image, 'position':position, 'offset': offset, 'layer':layer, 'id': id})
             except:
                 try:
-                    image = pygame.image.load(spritesheet_path)
-                    offset = self.load_image_offset(image, dimensions, index)
+                    image = pygame.image.load(spritesheet_path).convert()
+                    image.set_colorkey((0,0,0))
+                    offset = self.load_image_offset(image, dimensions, 'hound', index)
                     image = pygame.transform.scale(image, dimensions)
                     self.tiles.append({'image':image, 'position':position, 'offset': offset, 'layer':layer, 'id': id})
-                except:
-                    print(f'cannot load {spritesheet_path}...')
+                except Exception as e:
+                    print(f'could not load {spritesheet_path}')
 
         #Sorting the tiles according to the layer
         def get_layer(dict):
@@ -45,7 +46,7 @@ class TileMap:
 
         self.tiles.sort(key=get_layer)
 
-    def load_image_offset(self, image, dimensions, index):
+    def load_image_offset(self, image, dimensions, id, index):
         try:
             offset_data = json.load(open(f'data/configs/offsets/{id}_offset.json', 'r'))
             offset = offset_data[str(index)]

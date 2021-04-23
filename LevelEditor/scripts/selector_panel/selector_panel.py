@@ -11,7 +11,7 @@ class Selector_Panel:
 
     def show(self):
         #Rendering background
-        pygame.draw.rect(screen, colors['selector'], (0,0,self.w, self.h))
+        pygame.draw.rect(screen, colors['selector'], (0,0,self.w, screen.get_height()))
 
         #Rendering the names of the selectors
         for selector in self.selectors:
