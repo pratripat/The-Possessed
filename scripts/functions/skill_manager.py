@@ -1,5 +1,5 @@
 from .skill import Skill
-import pygame
+import pygame, json
 
 def secs_to_mins(seconds):
     if seconds >= 60:
@@ -8,18 +8,14 @@ def secs_to_mins(seconds):
     return f'00:{seconds:02d}'
 
 class Skill_Manager:
-    def __init__(self, owner):
+    def __init__(self, owner, data):
         self.owner = owner
-        self.icon_background_image = pygame.image.load('data/graphics/images/icon_background.png')
-        self.skills = [None for _ in range(6)]
-        self.skills[0] = Skill('instant_health', 30, 1)
-        self.skills[1] = Skill('extra_speed', 50, 30)
-        self.skills[2] = Skill('extra_damage', 50, 20)
-        self.skills[3] = Skill('thorns', 50, 20)
-        self.skills[4] = Skill('invisibility', 20, 20)
-        self.skills[5] = Skill('invincibility', 20, 20)
-        self.selected_skill = None
-        self.current_skills = []
+        self.icon_background_image = pygame.image.load('data/graphics/images/icon_background.png').convert()
+        self.icon_background_image.set_colorkey((0,0,0))
+        self.skill_durations = json.load(open('data/configs/skills/skill_duration.json', 'r'))
+        self.skills = data['skills']
+        self.selected_skill = data['selected_skill']
+        self.current_skills = data['current_skills']
 
     def update_skills(self, dt):
         for skill in self.skills:
@@ -35,10 +31,12 @@ class Skill_Manager:
                 else:
                     self.owner.speed = 6
             if skill.type == 'extra_damage':
-                if skill.using_timer > 0:
-                    self.owner.attack_damage = 30
-                else:
-                    self.owner.attack_damage = 20
+                if self.owner.weapon:
+                    if skill.using_timer > 0:
+                        self.owner.weapon.extra_damage()
+                    else:
+                        self.owner.weapon.reset_damage()
+
             if skill.type == 'thorns':
                 if skill.using_timer > 0:
                     self.owner.thorns = True
@@ -65,13 +63,13 @@ class Skill_Manager:
         for skill in self.skills:
             if skill in self.current_skills and self.selected_skill.waiting_timer > 0:
                 if self.selected_skill.using_timer > 0:
-                    font.render(surface, f'Using skill currently', [surface.get_width()/2+4, surface.get_height()-154], center=[True, True], scale=1.5, color=(41,43,48))
-                    font.render(surface, f'Using skill currently', [surface.get_width()/2+2, surface.get_height()-152], center=[True, True], scale=1.5, color=(97,56,84))
-                    font.render(surface, f'Using skill currently', [surface.get_width()/2, surface.get_height()-150], center=[True, True], scale=1.5, color=(171,108,132))
-
-                font.render(surface, f'Skill active again in {secs_to_mins(round(self.selected_skill.waiting_timer))}', [surface.get_width()/2+4, surface.get_height()-104], center=[True, True], scale=1.5, color=(41,43,48))
-                font.render(surface, f'Skill active again in {secs_to_mins(round(self.selected_skill.waiting_timer))}', [surface.get_width()/2+2, surface.get_height()-102], center=[True, True], scale=1.5, color=(97,56,84))
-                font.render(surface, f'Skill active again in {secs_to_mins(round(self.selected_skill.waiting_timer))}', [surface.get_width()/2, surface.get_height()-100], center=[True, True], scale=1.5, color=(171,108,132))
+                    font.render(surface, f'Using skill currently ({secs_to_mins(round(self.selected_skill.using_timer))})', [surface.get_width()/2+4, surface.get_height()-104], center=[True, True], scale=1.5, color=(41,43,48))
+                    font.render(surface, f'Using skill currently ({secs_to_mins(round(self.selected_skill.using_timer))})', [surface.get_width()/2+2, surface.get_height()-102], center=[True, True], scale=1.5, color=(97,56,84))
+                    font.render(surface, f'Using skill currently ({secs_to_mins(round(self.selected_skill.using_timer))})', [surface.get_width()/2, surface.get_height()-100], center=[True, True], scale=1.5, color=(171,108,132))
+                else:
+                    font.render(surface, f'Skill active again in {secs_to_mins(round(self.selected_skill.waiting_timer))}', [surface.get_width()/2+4, surface.get_height()-104], center=[True, True], scale=1.5, color=(41,43,48))
+                    font.render(surface, f'Skill active again in {secs_to_mins(round(self.selected_skill.waiting_timer))}', [surface.get_width()/2+2, surface.get_height()-102], center=[True, True], scale=1.5, color=(97,56,84))
+                    font.render(surface, f'Skill active again in {secs_to_mins(round(self.selected_skill.waiting_timer))}', [surface.get_width()/2, surface.get_height()-100], center=[True, True], scale=1.5, color=(171,108,132))
             elif skill == self.selected_skill and self.selected_skill:
                     font.render(surface, 'Right click to use', [surface.get_width()/2+4, surface.get_height()-104], center=[True, True], scale=1.5, color=(41,43,48))
                     font.render(surface, 'Right click to use', [surface.get_width()/2+2, surface.get_height()-102], center=[True, True], scale=1.5, color=(97,56,84))
@@ -97,3 +95,10 @@ class Skill_Manager:
         if self.selected_skill and self.selected_skill not in self.current_skills:
             self.current_skills.append(self.selected_skill)
             self.selected_skill.use()
+
+    def add_skill(self, skill_id):
+        for i, skill in enumerate(self.skills):
+            if skill == None:
+                skill_time_duration = self.skill_durations[skill_id]
+                self.skills[i] = Skill(skill_id, *skill_time_duration)
+                return

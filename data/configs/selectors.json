@@ -54,5 +54,26 @@
     "resize": true,
     "scale": 3,
     "autotile_config": null
+  },
+  "lootbox": {
+    "id": "lootbox",
+    "spritesheet_path": "data/graphics/spritesheet/lootbox.png",
+    "resize": true,
+    "scale": 3,
+    "autotile_config": null
+  },
+  "door": {
+    "id": "door",
+    "spritesheet_path": "data/graphics/spritesheet/door.png",
+    "resize": true,
+    "scale": 3,
+    "autotile_config": null
+  },
+  "octo": {
+    "id": "octo",
+    "spritesheet_path": "data/graphics/spritesheet/octo.png",
+    "resize": true,
+    "scale": 3,
+    "autotile_config": null
   }
 }

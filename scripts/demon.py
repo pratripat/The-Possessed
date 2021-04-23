@@ -14,7 +14,7 @@ class Demon(Entity):
         self.attack_timer = 30
         self.active = False
 
-    #Updates and moves the zombie towards the player
+    #Updates and moves the demon towards the player
     def run(self, scroll, dt, player):
         self.directions['down'] = True
         if self.movement_timer <= 0:
@@ -28,14 +28,14 @@ class Demon(Entity):
 
         if self.active:
             if player.position[0] < self.position[0]:
-                self.flip(False)
-            elif player.position[0] > self.position[0]:
                 self.flip(True)
+            elif player.position[0] > self.position[0]:
+                self.flip(False)
 
         if self.movement_timer > 0:
             self.movement_timer -= 1
 
-    #Moves the zombie
+    #Moves the demon
     def movement(self):
         animation_state = 'idle'
 
@@ -53,7 +53,7 @@ class Demon(Entity):
         else:
             self.velocity[0] = 0
 
-        #Gravity only (zombies do not jump in this game)
+        #Gravity only (demons do not jump in this game)
         if self.directions['down']:
             self.velocity[1] += gravity
 
@@ -64,14 +64,14 @@ class Demon(Entity):
 
         self.update_animations(animation_state)
 
-    #Sets animation of the zombie
+    #Sets animation of the demon
     def update_animations(self, animation_state):
         if self.invincible_timer > 0:
             animation_state = 'damage'
 
         self.set_animation(animation_state)
 
-    #Sets movement towards the player if the zombie is on screen
+    #Sets movement towards the player if the demon is on screen
     def move_towards_player(self, scroll, player):
         self.active = False
         if not self.invincible_timer > 0 and self.on_screen(scroll, player) and not player.invisible:
@@ -81,7 +81,7 @@ class Demon(Entity):
             elif player.position[0] > self.position[0]:
                 self.directions['right'] = True
 
-    #Returns if zombie can be seen by the player
+    #Returns if demon can be seen by the player
     def on_screen(self, scroll, player):
         return (
             abs(self.center[0]-player.center[0]) < 900 and
@@ -102,9 +102,9 @@ class Demon(Entity):
 
         if self.attack_timer == 0 and not player.invisible:
             demon_image = self.current_animation.image
-            projectiles.append(Projectile([player], self.position, demon_image.get_size(), self.attack_damage, 5))
+            projectiles.append(Projectile(self, [player], self.position, demon_image.get_size(), self.attack_damage, 5))
             self.attack_timer = 30
 
-    #Returns if the zombie's health is 0
+    #Returns if the demon's health is 0
     def dead(self):
         return self.health <= 0

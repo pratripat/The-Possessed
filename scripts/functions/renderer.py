@@ -24,7 +24,7 @@ class Renderer:
 
                 if tile['id'] == 'torch':
                     light_sin = math.sin(game_time)*10
-                    light_radius = round(100+light_sin)
+                    light_radius = round(150+light_sin)
                     circle_surf = get_circle_surface(light_radius, (41,43,48))
                     screen.blit(circle_surf, (tile['position'][0]-scroll[0]-light_radius+24, tile['position'][1]-scroll[1]-light_radius+20), special_flags=pygame.BLEND_RGBA_ADD)
 

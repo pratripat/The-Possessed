@@ -5,7 +5,6 @@ def load_images_from_spritesheet(filename):
     try:
         spritesheet = pygame.image.load(filename).convert()
     except:
-        print('file not found...')
         return []
 
     rows = []
@@ -46,4 +45,4 @@ def load_images_from_spritesheet(filename):
 
 #Returns the collision between two rects
 def rect_rect_collision(rect1, rect2):
-    return rect1.colliderect(rect2)    
+    return rect1.colliderect(rect2)

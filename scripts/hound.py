@@ -14,7 +14,7 @@ class Hound(Entity):
         self.attack_timer = 30
         self.active = False
 
-    #Updates and moves the zombie towards the player
+    #Updates and moves the hound towards the player
     def run(self, scroll, dt, player):
         self.directions['down'] = True
         if self.movement_timer <= 0:
@@ -35,7 +35,7 @@ class Hound(Entity):
         if self.movement_timer > 0:
             self.movement_timer -= 1
 
-    #Moves the zombie
+    #Moves the hound
     def movement(self):
         animation_state = 'idle'
 
@@ -53,7 +53,7 @@ class Hound(Entity):
         else:
             self.velocity[0] = 0
 
-        #Gravity only (zombies do not jump in this game)
+        #Gravity only (hounds do not jump in this game)
         if self.directions['down']:
             self.velocity[1] += gravity
 
@@ -64,24 +64,24 @@ class Hound(Entity):
 
         self.update_animations(animation_state)
 
-    #Sets animation of the zombie
+    #Sets animation of the hound
     def update_animations(self, animation_state):
         if self.invincible_timer > 0:
             animation_state = 'damage'
 
         self.set_animation(animation_state)
 
-    #Sets movement towards the player if the zombie is on screen
+    #Sets movement towards the player if the hound is on screen
     def move_towards_player(self, scroll, player):
         self.active = False
         if not self.invincible_timer > 0 and self.on_screen(scroll, player) and not player.invisible:
             self.active = True
-            if player.position[0] < self.position[0]:
+            if player.center[0] < self.center[0]:
                 self.directions['left'] = True
-            elif player.position[0] > self.position[0]:
+            elif player.center[0] > self.center[0]:
                 self.directions['right'] = True
 
-    #Returns if zombie can be seen by the player
+    #Returns if hound can be seen by the player
     def on_screen(self, scroll, player):
         return (
             abs(self.center[0]-player.center[0]) < 900 and
@@ -102,9 +102,9 @@ class Hound(Entity):
 
         if self.attack_timer == 0 and not player.invisible:
             hound_image = self.current_animation.image
-            projectiles.append(Projectile([player], self.position, hound_image.get_size(), self.attack_damage, 5))
+            projectiles.append(Projectile(self, [player], self.position, hound_image.get_size(), self.attack_damage, 5))
             self.attack_timer = 30
 
-    #Returns if the zombie's health is 0
+    #Returns if the hound's health is 0
     def dead(self):
         return self.health <= 0

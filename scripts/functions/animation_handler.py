@@ -83,7 +83,7 @@ class Animation:
                 break
 
     #Renders the current image
-    def render(self, surface, position, flipped, colorkey):
+    def render(self, surface, position, flipped=False, colorkey=(0,0,0)):
         offset = [0,0]
         image = self.image
         if flipped:

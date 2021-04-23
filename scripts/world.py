@@ -7,23 +7,23 @@ from scripts.functions.animation_handler import Animation_Handler
 from scripts.functions.entity_manager import Entity_Manager
 from scripts.functions.particle import Particle_System
 from scripts.functions.font_renderer import Font
+from scripts.functions.select_skill_menu import Select_skill_menu
 
 class World:
     def __init__(self):
         self.animation_handler = Animation_Handler()
         self.particles = Particle_System()
-        self.tilemap = TileMap(f'data/saved.json')
-        self.tilemap.load_map()
         self.renderer = Renderer()
-        self.entity_manager = Entity_Manager(self.animation_handler, self.tilemap)
         self.camera = Camera()
-        self.camera.set_target(self.entity_manager.player)
         self.camera.set_movement(0.05)
         self.font = Font('data/graphics/spritesheet/character_spritesheet')
-        self.projectiles = []
-        self.game_time = 0
 
-        self.collidables = self.tilemap.get_tiles('ground', 0)
+        self.projectiles = []
+        self.level_order = json.load(open('data/configs/level_order.json', 'r'))
+        self.level = 0
+        self.load_next_level(self.level)
+
+        self.skill_menu = Select_skill_menu(self.font, self.entity_manager.player.skill_manager)
 
     @property
     def dt(self):
@@ -32,20 +32,37 @@ class World:
         if fps != 0:
             return 1/fps
 
-        return 0
+        return 0.001
+
+    def load_next_level(self, level):
+        if self.level >= 1:
+            player_data = self.entity_manager.player.get_data()
+        else:
+            player_data = None
+
+        self.tilemap = TileMap(f'data/levels/{self.level_order[self.level]}.json')
+        self.tilemap.load_map()
+        self.entity_manager = Entity_Manager(self, player_data=player_data)
+        self.camera.set_target(self.entity_manager.player)
+
+        self.particles.clear()
+        self.projectiles.clear()
+
+        self.collidables = self.tilemap.get_tiles('ground', 0)
+        self.game_time = 0
 
     def run(self):
-        clock.tick(100)
+        clock.tick(60)
 
         self.game_time += self.dt
 
         self.camera.update(screen)
 
-        self.entity_manager.run(self.camera.scroll, self.collidables, self.projectiles, self.particles, self.dt)
+        self.entity_manager.run(screen, self.camera.scroll, self.collidables, self.projectiles, self.particles, self.dt, gravity)
         self.particles.run()
 
         for projectile in self.projectiles[:]:
-            projectile.update(self.camera, self.particles)
+            projectile.update(self.camera)
 
             if projectile.destroyed:
                 self.projectiles.remove(projectile)
@@ -81,6 +98,15 @@ class World:
                     self.entity_manager.player.skill_manager.set_selected_skill(4)
                 if event.key == pygame.K_6:
                     self.entity_manager.player.skill_manager.set_selected_skill(5)
+
+                if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT:
+                    self.entity_manager.player.inventory.select_next_item()
+
+                if event.key == pygame.K_e:
+                    self.entity_manager.equip_dropped_entity()
+
+                if event.key == pygame.K_q:
+                    self.entity_manager.drop_player_item()
 
                 if event.key == pygame.K_a or event.key == pygame.K_LEFT:
                     directions['left'] = True
