@@ -21,7 +21,7 @@ class World:
         self.projectiles = []
         self.level_order = json.load(open('data/configs/level_order.json', 'r'))
         self.level = 0
-        self.load_next_level(self.level)
+        self.load_level(self.level)
 
         self.skill_menu = Select_skill_menu(self.font, self.entity_manager.player.skill_manager)
 
@@ -34,7 +34,14 @@ class World:
 
         return 0.001
 
-    def load_next_level(self, level):
+    def load_level(self, level):
+        if self.level_order[self.level].split('_')[0] == 'boss':
+            pygame.mixer.music.load('data/music/boss_fight.wav')
+            pygame.mixer.music.play(-1)
+        else:
+            pygame.mixer.music.load('data/music/game_music.wav')
+            pygame.mixer.music.play(-1)
+
         if self.level >= 1:
             player_data = self.entity_manager.player.get_data()
         else:
@@ -128,8 +135,6 @@ class World:
 
     #Starts the game
     def main_loop(self):
-        pygame.mixer.music.load('data/music/game_music.wav')
-        pygame.mixer.music.play(-1)
         while True:
             self.event_loop()
             self.run()

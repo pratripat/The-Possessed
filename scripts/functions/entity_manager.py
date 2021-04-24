@@ -10,6 +10,7 @@ from scripts.octo import Octo
 class Entity_Manager:
     def __init__(self, world, player_data=None, final_level=False):
         self.world = world
+        self.level_transition = pygame.mixer.Sound('data/sfx/level_transition.wav')
         self.player = Player(self.world.animation_handler, self.get_entity(self.world.tilemap, 'player')[0], player_data)
         self.enemies = [Demon(self.world.animation_handler, position) for position in self.get_entity(self.world.tilemap, 'demon')] + [Hound(self.world.animation_handler, position) for position in self.get_entity(self.world.tilemap, 'hound')]
         self.loot_boxes = [LootBox(self.world.animation_handler, position) for position in self.get_entity(self.world.tilemap, 'lootbox')]
@@ -22,7 +23,7 @@ class Entity_Manager:
         except:
             if not final_level:
                 boss_ids = ['octo']
-                bosses = [Octo(self.world.animation_handler, [0,0])]
+                bosses = [Octo(self.world.camera, self.world.animation_handler, [0,0])]
                 for i, id in enumerate(boss_ids):
                     try:
                         position = self.get_entity(self.world.tilemap, id)[0]
@@ -69,6 +70,7 @@ class Entity_Manager:
 
         if self.door:
             if rect_rect_collision(self.player.rect, self.door.rect):
+                self.level_transition.play()
                 self.finish_level()
 
         for projectile in projectiles:
@@ -126,4 +128,4 @@ class Entity_Manager:
 
     def finish_level(self):
         self.world.level += 1
-        self.world.load_next_level(self.world.level)
+        self.world.load_level(self.world.level)
