@@ -76,17 +76,17 @@ class Select_skill_menu:
 
         pygame.draw.rect(surface, (41,43,48), (center[0]-300, center[1]-300, 600, 600), border_radius=30)
 
-        self.font.render(surface, 'you have reached', [center[0], center[1]-200], color=(97,56,84), scale=2, center=[True, True])
-        self.font.render(surface, 'you have reached', [center[0], center[1]-200], color=(171,108,132), scale=2, center=[True, True])
+        self.font.render(surface, 'you have reached', [center[0]+20, center[1]-200], color=(97,56,84), scale=2, center=[True, True])
+        self.font.render(surface, 'you have reached', [center[0]+16, center[1]-204], color=(171,108,132), scale=2, center=[True, True])
 
-        self.font.render(surface, 'one step closer to me.', [center[0], center[1]-150], color=(97,56,84), scale=2, center=[True, True])
-        self.font.render(surface, 'one step closer to me.', [center[0], center[1]-150], color=(171,108,132), scale=2, center=[True, True])
+        self.font.render(surface, 'one step closer to me.', [center[0]+20, center[1]-150], color=(97,56,84), scale=2, center=[True, True])
+        self.font.render(surface, 'one step closer to me.', [center[0]+16, center[1]-154], color=(171,108,132), scale=2, center=[True, True])
 
         if self.current_selected_button:
-            x, y = self.current_selected_button.x-5, self.current_selected_button.y-5
-            w, h = self.current_selected_button.w+10, self.current_selected_button.h+10
+            x, y = self.current_selected_button.x-10, self.current_selected_button.y-10
+            w, h = self.current_selected_button.w+20, self.current_selected_button.h+20
 
-            pygame.draw.rect(surface, (97,56,84), (x, y, w, h))
+            pygame.draw.rect(surface, (97,56,84), (x, y, w, h), border_radius=20)
 
             self.font.render(surface, 'description:', [center[0]-230, y+140], color=(97,56,84))
             self.font.render(surface, 'description:', [center[0]-234, y+136], color=(171,108,132))
@@ -111,6 +111,10 @@ class Select_skill_menu:
     def run(self, surface):
         self.background = surface.copy()
         self.running = True
+
+        pygame.mixer.music.load('data/music/skill_selector.wav')
+        pygame.mixer.music.play(-1)
+
         while self.running:
             self.event_loop()
             self.update()

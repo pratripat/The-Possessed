@@ -1,4 +1,4 @@
-import pygame, math
+import pygame, math, random
 from .boss import Boss
 from .functions.health_bar import Health_Bar
 from .functions.projectile import Projectile
@@ -54,8 +54,9 @@ class Blob:
         )
 
 class Octo(Boss):
-    def __init__(self, animations, position):
+    def __init__(self, camera, animations, position):
         super().__init__(animations, 'octo', position)
+        self.camera = camera
         self.max_health = 600
         self.health = self.max_health
         self.speed = 3
@@ -64,17 +65,19 @@ class Octo(Boss):
         self.health_bar = Health_Bar([300, 10], [800, 33], self.max_health, 'octo_health_bar')
         self.blobs = []
 
-        self.attack_timer = self.max_attack_timer = 5
+        self.attack_timer = self.max_attack_timer = 2
         self.move_timer = self.max_move_timer = 10
         self.moving_time = 2
         self.turn = 0
 
     def update_attrs(self, dt):
         if self.health <= self.max_health/2:
-            self.phase = 1
-            self.max_attack_timer = 3.5
+            self.phase = 2
+            self.max_attack_timer = 3
+
         elif self.health <= self.max_health*3/4:
-            self.max_attack_timer = 2
+            self.phase = 1
+            self.max_attack_timer = 3
 
         if self.move_timer > 0:
             self.move_timer -= dt
@@ -99,8 +102,16 @@ class Octo(Boss):
 
             if self.phase == 0:
                 self.blobs.append(Blob(player, self.center))
+
             if self.phase == 1:
-                angle = 0
+                velocity = player.center[0]-self.center[0]
+                velocity /= abs(velocity)
+
+                for i in range(3):
+                    self.blobs.append(Blob(player, self.center, [velocity, (i-1)/2]))
+
+            if self.phase == 2:
+                angle = random.randint(0, 360)
                 length = 1
                 n = 10
 
@@ -112,6 +123,8 @@ class Octo(Boss):
                     self.blobs.append(Blob(player, self.center, velocity))
 
                     angle += 360/n
+
+            self.camera.set_screen_shake(5, 7)
 
     def render(self, surface, scroll):
         super().render(surface, scroll)
