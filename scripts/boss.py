@@ -23,6 +23,9 @@ class Boss(Entity):
                 self.invincible_timer -= 1
 
     def movement(self, gravity):
+        if self.is_dead:
+            return
+
         self.directions['down'] = True
 
         animation_state = 'idle'

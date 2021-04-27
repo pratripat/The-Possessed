@@ -85,7 +85,7 @@ class World:
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    self.entity_manager.player.attack()
+                    self.entity_manager.player.attack(self.projectiles)
                 if event.button == 3:
                     self.entity_manager.player.skill_manager.use_selected_skill()
             if event.type == pygame.KEYDOWN:

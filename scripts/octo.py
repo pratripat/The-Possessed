@@ -47,10 +47,10 @@ class Blob:
 
     def is_offscreen(self, scroll, dimensions):
         return (
-            self.position[0]-scroll[0]-self.image.get_width() < 0 or
-            self.position[1]-scroll[1]-self.image.get_height() < 0 or
-            self.position[0]-scroll[0]+self.image.get_width() > dimensions[0] or
-            self.position[1]-scroll[1]+self.image.get_height() > dimensions[1]
+            self.position[0]-scroll[0]-self.image.get_width() < -dimensions[0] or
+            self.position[1]-scroll[1]-self.image.get_height() < -dimensions[1] or
+            self.position[0]-scroll[0]+self.image.get_width() > dimensions[0]*2 or
+            self.position[1]-scroll[1]+self.image.get_height() > dimensions[1]*2
         )
 
 class Octo(Boss):
@@ -71,7 +71,10 @@ class Octo(Boss):
         self.turn = 0
 
     def update_attrs(self, dt):
-        if self.health <= self.max_health/2:
+        if self.health <= self.max_health/4:
+            self.phase = 3
+
+        elif self.health <= self.max_health/2:
             self.phase = 2
             self.max_attack_timer = 3
 
@@ -97,7 +100,10 @@ class Octo(Boss):
             self.attack_timer -= dt
 
     def attack(self, player):
-        if round(self.attack_timer) == 0 and not self.is_dead:
+        if self.is_dead:
+            return
+
+        if round(self.attack_timer) == 0:
             self.attack_timer = self.max_attack_timer
 
             if self.phase == 0:
@@ -108,12 +114,20 @@ class Octo(Boss):
                 velocity /= abs(velocity)
 
                 for i in range(3):
-                    self.blobs.append(Blob(player, self.center, [velocity, (i-1)/2]))
+                    if i != 1:
+                        self.blobs.append(Blob(player, self.center, [velocity, random.uniform(min(0, i-1), max(0, i-1))]))
+                        continue
 
-            if self.phase == 2:
-                angle = random.randint(0, 360)
+                    self.blobs.append(Blob(player, self.center, [velocity, 0]))
+
+            if self.phase > 1:
+                if self.phase == 2:
+                    n = 10
+                else:
+                    n = 15
+
+                angle = random.randint(0, 90)
                 length = 1
-                n = 10
 
                 for i in range(n):
                     velocity = [0,0]
