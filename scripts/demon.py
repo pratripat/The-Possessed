@@ -14,6 +14,8 @@ class Demon(Entity):
         self.attack_timer = 30
         self.active = False
 
+        self.damage_sfx = pygame.mixer.Sound('data/sfx/damage_enemy2.wav')
+
     #Updates and moves the demon towards the player
     def run(self, scroll, dt, player):
         self.directions['down'] = True
@@ -95,6 +97,7 @@ class Demon(Entity):
         if self.invincible_timer == 0:
             self.health -= damage
             self.invincible_timer = 40
+            self.damage_sfx.play()
 
     #Adds projectile against the player
     def attacks(self, player, projectiles):

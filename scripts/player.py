@@ -43,11 +43,13 @@ class Player(Entity):
         self.health_bar = Health_Bar([10,10], [200,40], self.max_health)
         self.skill_manager = Skill_Manager(self, self.DATA)
         self.inventory = Inventory(self, [10, 80], self.DATA)
-        self.inventory.add_item('stick')
-        self.inventory.add_item('sword')
+
+        self.damage_sfx = pygame.mixer.Sound('data/sfx/damage_player.wav')
 
         if self.load_weapon():
             self.attack_timer = self.weapon.duration
+        else:
+            self.attack_timer = 0
 
     def render(self, surface, scroll, colorkey):
         super().render(surface, scroll, colorkey)
@@ -122,8 +124,9 @@ class Player(Entity):
         self.set_animation(animation_state)
 
     #Sets attacking attribute to true
-    def attack(self):
+    def attack(self, projectiles):
         if not self.attacking:
+            projectiles.append(Projectile(self, [], self.position, self.image.get_size(), 0, 2))
             self.attacking = True
 
             if not self.load_weapon():
@@ -146,6 +149,7 @@ class Player(Entity):
         if self.invincible_timer == 0 and not self.invincible:
             self.health -= damage
             self.invincible_timer = 12
+            self.damage_sfx.play()
 
     #Returns if player health is 0
     def dead(self):
