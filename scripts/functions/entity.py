@@ -13,12 +13,17 @@ class Entity:
         self.collisions = {k:False for k in ('top', 'right', 'bottom', 'left')}
 
     #Renders the current animation of the entity
-    def render(self, surface, scroll, colorkey=None):
+    def render(self, surface, scroll, colorkey=None, angle=None):
         offset = [0,0]
 
         if self.centered:
             offset[0] -= self.image.get_width()//2
             offset[1] -= self.image.get_height()//2
+
+        if angle:
+            rotated_image = pygame.transform.rotate(self.current_animation.image, angle)
+            surface.blit(rotated_image, (self.position[0]+offset[0]-scroll[0], self.position[1]+offset[1]-scroll[1]))
+            return
 
         self.current_animation.render(surface, (self.position[0]+offset[0]-scroll[0], self.position[1]+offset[1]-scroll[1]), self.flipped, colorkey)
 

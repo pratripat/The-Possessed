@@ -75,5 +75,12 @@
     "resize": true,
     "scale": 3,
     "autotile_config": null
+  },
+  "eye": {
+    "id": "eye",
+    "spritesheet_path": "data/graphics/spritesheet/eye.png",
+    "resize": true,
+    "scale": 3,
+    "autotile_config": null
   }
 }

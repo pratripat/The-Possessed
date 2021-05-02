@@ -6,6 +6,7 @@ from scripts.hound import Hound
 from scripts.loot_box import LootBox
 from scripts.door import Door
 from scripts.octo import Octo
+from scripts.eye import Eye
 
 class Entity_Manager:
     def __init__(self, world, player_data=None, final_level=False):
@@ -22,8 +23,8 @@ class Entity_Manager:
             self.door = Door(self.get_entity(self.world.tilemap, 'door')[0], self.world.tilemap)
         except:
             if not final_level:
-                boss_ids = ['octo']
-                bosses = [Octo(self.world.camera, self.world.animation_handler, [0,0])]
+                boss_ids = ['octo', 'eye']
+                bosses = [Octo(self.world.camera, self.world.animation_handler, [0,0]), Eye(self.world.animation_handler, [0,0])]
                 for i, id in enumerate(boss_ids):
                     try:
                         position = self.get_entity(self.world.tilemap, id)[0]
@@ -92,10 +93,10 @@ class Entity_Manager:
         if self.door:
             self.door.render(surface, scroll)
 
+        self.player.render(surface, scroll, (0,0,0))
+
         if self.boss:
             self.boss.render(surface, scroll)
-
-        self.player.render(surface, scroll, (0,0,0))
 
         for entity in self.dropped_entities:
             entity.render(surface, scroll)
@@ -105,8 +106,12 @@ class Entity_Manager:
             self.boss.health_bar.position[0] = surface.get_width()/2-self.boss.health_bar.dimensions[0]/2
             self.boss.health_bar.render(surface, self.boss.health, (171,108,132))
 
+        self.player.health_bar.position[1] = surface.get_height()-self.player.health_bar.dimensions[1]-10
         self.player.health_bar.render(surface, self.player.health, (171,108,132), [20,0])
         self.player.skill_manager.render_skills(surface, font)
+
+        self.player.inventory.position[0] = self.player.health_bar.position[0]+self.player.health_bar.dimensions[0]+10
+        self.player.inventory.position[1] = surface.get_height()-self.player.inventory.size-10
         self.player.inventory.render(surface)
 
     def get_entity(self, tilemap, id):

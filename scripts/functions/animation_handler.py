@@ -33,6 +33,15 @@ class Animation_Data:
     def load_config(self):
         try:
             self.config = json.load(open(self.path+'/'+'config.json', 'r'))
+
+            try:
+                flipped = self.config['flip']
+            except:
+                self.config['flip'] = False
+                file = open(self.path+'/'+'config.json', 'w')
+                file.write(json.dumps(self.config))
+                file.close()
+
         except:
             print('not able to load file, using default configuration of animation..')
             self.config = {
@@ -40,11 +49,15 @@ class Animation_Data:
                 'loop': True,
                 'speed': 1,
                 'scale': 1,
-                'centered': False
+                'centered': False,
+                'flip': False
             }
             file = open(self.path+'/'+'config.json', 'w')
             file.write(json.dumps(self.config))
             file.close()
+
+        if self.config['flip']:
+            self.images = [pygame.transform.flip(image, True, False) for image in self.images]
 
     #Returns total number of frames of the animation
     def get_frames(self):

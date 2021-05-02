@@ -3,8 +3,8 @@ from .functions.entity import Entity
 from .functions.projectile import Projectile
 
 class Boss(Entity):
-    def __init__(self, animations, id, position):
-        super().__init__(animations, id, position, False, 'idle')
+    def __init__(self, animations, id, position, current_animation='idle'):
+        super().__init__(animations, id, position, False, current_animation)
         self.directions = {k : False for k in ['up', 'right', 'down', 'left']}
         self.speed = 1
         self.health = 100
