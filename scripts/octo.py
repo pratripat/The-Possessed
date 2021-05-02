@@ -62,7 +62,7 @@ class Octo(Boss):
         self.speed = 3
         self.phase = 0
 
-        self.health_bar = Health_Bar([300, 10], [800, 33], self.max_health, 'octo_health_bar')
+        self.health_bar = Health_Bar([300, 10], [800, 33], self.max_health, 'boss_health_bar')
         self.blobs = []
 
         self.attack_timer = self.max_attack_timer = 2

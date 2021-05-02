@@ -55,7 +55,7 @@ class World:
         self.particles.clear()
         self.projectiles.clear()
 
-        self.collidables = self.tilemap.get_tiles('ground', 0)
+        self.collidables = self.tilemap.get_tiles('ground')
         self.game_time = 0
 
     def run(self):
