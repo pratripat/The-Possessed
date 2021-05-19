@@ -1,7 +1,8 @@
-from LevelEditor.settings import *
+import pygame
 
 class Rectangle:
-    def __init__(self):
+    def __init__(self, editor):
+        self.editor = editor
         self.is_creating = False
         self.starting_location = []
         self.ending_location = []
@@ -9,7 +10,7 @@ class Rectangle:
     def show(self):
         #Renders the rectangle if the dimensions have been defined
         if len(self.ending_location) != 0:
-            pygame.draw.rect(screen, colors['yellow'], (self.starting_location[0], self.starting_location[1], self.ending_location[0]-self.starting_location[0], self.ending_location[1]-self.starting_location[1]), 2)
+            pygame.draw.rect(self.editor.screen, (255,255,0), (self.starting_location[0], self.starting_location[1], self.ending_location[0]-self.starting_location[0], self.ending_location[1]-self.starting_location[1]), 2)
 
     def create(self, location):
         if not self.is_creating:

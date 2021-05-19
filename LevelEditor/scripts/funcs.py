@@ -1,11 +1,12 @@
-from LevelEditor.settings import *
+import pygame
 
 def load_images_from_spritesheet(filename):
     #Tries to load the file
     try:
         spritesheet = pygame.image.load(filename).convert()
-    except:
-        print('file not found...')
+    except Exception as e:
+        print(f'FILENAME: {filename}')
+        print(f'LOAD IMAGES FROM SPRITESHEET ERROR: {e}')
         return []
 
     rows = []
@@ -37,7 +38,7 @@ def load_images_from_spritesheet(filename):
                         break
 
                 image = pygame.Surface((width, height))
-                image.set_colorkey(colors['black'])
+                image.set_colorkey((0,0,0))
                 image.blit(spritesheet, (-start_position[0], -start_position[1]))
 
                 images.append(image)

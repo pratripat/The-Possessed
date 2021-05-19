@@ -115,8 +115,8 @@ class Entity_Manager:
         self.player.inventory.render(surface)
 
     def get_entity(self, tilemap, id):
-        tiles = tilemap.get_tiles(id)
-        positions = [[tile.x, tile.y] for tile in tiles]
+        rects = tilemap.get_rects_with_id(id)
+        positions = [[rect[0], rect[1]] for rect in rects]
 
         return positions
 

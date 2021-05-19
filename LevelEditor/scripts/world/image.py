@@ -1,9 +1,9 @@
-from LevelEditor.settings import *
-from LevelEditor.scripts.funcs import load_images_from_spritesheet
-import json
+from ..funcs import load_images_from_spritesheet
+import pygame, json
 
 class Image:
-    def __init__(self, j, i, x, y, offset, data=None):
+    def __init__(self, editor, j, i, x, y, offset, data=None, selection=None):
+        self.editor = editor
         self.i = i
         self.j = j
         self.position = [x,y]
@@ -11,37 +11,49 @@ class Image:
 
         if data:
             self.id = data['id']
+            self.filepath = data['filepath']
+            self.group_name = data['group_name']
             self.image = data['image']
             self.index = data['index']
-        elif selection['image']:
-            self.id = selection['image'].id
-            self.image = selection['image'].image
-            self.index = selection['image'].index
+            self.scale = data['scale']
+        elif selection:
+            self.id = selection.id
+            self.filepath = selection.filepath
+            self.group_name = selection.group_name
+            self.image = selection.image
+            self.index = selection.index
+            self.scale = selection.scale
 
         try:
-            self.autotile_config = json.load(open(selection['image'].autotile_config_path, 'r'))
+            if selection:
+                self.autotile_config = json.load(open(selection.autotile_config_path, 'r'))
+                return
+
+            self.autotile_config = json.load(open(data['autotile_config_path'], 'r'))
         except:
             self.autotile_config = None
 
-    def show(self, surface=screen):
-        #Renders the image according to the scroll
-        surface.blit(self.image, [self.position[0]+self.offset[0]-scroll[0], self.position[1]+self.offset[1]-scroll[1]])
+    def show(self, surface=None):
+        if not surface:
+            surface = self.editor.screen
+        #Renders the image according to the self.editor.world.scroll
+        surface.blit(self.image, [self.position[0]+self.offset[0]-self.editor.world.scroll[0], self.position[1]+self.offset[1]-self.editor.world.scroll[1]])
 
-    def fill(self, images, depth=950):
+    def fill(self, images, selection, depth=950):
         if depth == 0:
             return
 
         for dir in [(0,-1), (1,0), (0,1), (-1,0)]:
             i, j = self.i+dir[1], self.j+dir[0]
 
-            if i-scroll[1]//res >= 0 and i-scroll[1]//res < screen.get_height()//res+1 and j-scroll[0]//res >= 0 and j-scroll[0]//res < screen.get_width()//res+1:
+            if i-self.editor.world.scroll[1]//self.editor.res >= 0 and i-self.editor.world.scroll[1]//self.editor.res < self.editor.screen.get_height()//self.editor.res+1 and j-self.editor.world.scroll[0]//self.editor.res >= 0 and j-self.editor.world.scroll[0]//self.editor.res < self.editor.screen.get_width()//self.editor.res+1:
                 neighbor = self.get_image_with_index(i, j, images)
 
                 #If the neighbor is not yet defined, the neighbor becomes an image object and is put into the images list
                 if not neighbor:
-                    neighbor = Image(j, i, j*res, i*res, self.offset)
+                    neighbor = Image(self.editor, j, i, j*self.editor.res, i*self.editor.res, self.offset, selection=selection)
                     images.append(neighbor)
-                    neighbor.fill(images, depth-1)
+                    neighbor.fill(images, selection, depth-1)
 
     def autotile(self, images, selector_panel_images):
         if self.autotile_config:
@@ -60,24 +72,26 @@ class Image:
             try:
                 key = str(int(binary, 2))
                 index = self.autotile_config[key]
-                self.image = selector_panel_images[index].image
+
+                images = load_images_from_spritesheet(f'data/graphics/spritesheet/{self.filepath}.png')
+                image = images[index]
+
+                self.image = pygame.transform.scale(image, (image.get_width()*self.scale, image.get_height()*self.scale))
                 self.index = index
 
                 try:
                     offset_data = json.load(open(f'data/configs/offsets/{self.id}_offset.json', 'r'))
                     offset = offset_data[str(self.index)]
-                    spritesheet_path = f'data/graphics/spritesheet/{self.id}.png'
-                    image = load_images_from_spritesheet(spritesheet_path)[self.index]
-                    offset[0] *= self.image.get_width()/image.get_width()
-                    offset[1] *= self.image.get_height()/image.get_height()
+                    offset[0] *= self.scale
+                    offset[1] *= self.scale
                 except Exception as e:
                     # print(e)
                     offset = [0,0]
 
                 self.offset = offset
 
-            except:
-                pass
+            except Exception as e:
+                print('AUTOTILE ERROR: ', e)
 
     def get_neighbors(self, images):
         #Returns neighbor images
@@ -85,7 +99,18 @@ class Image:
 
         for dir in [(0,-1), (1,0), (0,1), (-1,0)]:
             i, j = self.i+dir[1], self.j+dir[0]
-            if i-scroll[1]//res >= 0 and i-scroll[1]//res < screen.get_height()//res+1 and j-scroll[0]//res >= 0 and j-scroll[0]//res < screen.get_width()//res+1:
+            if i-self.editor.world.scroll[1]//self.editor.res >= 0 and i-self.editor.world.scroll[1]//self.editor.res < self.editor.screen.get_height()//self.editor.res+1 and j-self.editor.world.scroll[0]//self.editor.res >= 0 and j-self.editor.world.scroll[0]//self.editor.res < self.editor.screen.get_width()//self.editor.res+1:
+                neighbor = self.get_image_with_index(i, j, images)
+                neighbors.append(neighbor)
+
+        return neighbors
+
+    def get_neighbors_diagonally(self, images):
+        neighbors = []
+
+        for dir in [(-1,-1), (0,-1), (1,-1), (1,0), (1,1), (0,1), (-1,1), (-1,0)]:
+            i, j = self.i+dir[1], self.j+dir[0]
+            if i-self.editor.world.scroll[1]//self.editor.res >= 0 and i-self.editor.world.scroll[1]//self.editor.res < self.editor.screen.get_height()//self.editor.res+1 and j-self.editor.world.scroll[0]//self.editor.res >= 0 and j-self.editor.world.scroll[0]//self.editor.res < self.editor.screen.get_width()//self.editor.res+1:
                 neighbor = self.get_image_with_index(i, j, images)
                 neighbors.append(neighbor)
 
@@ -101,8 +126,8 @@ class Image:
 
     def within(self, starting, ending):
         #Returns image if it is within the rectangle dimension
-        sx, sy = starting[0]+scroll[0], starting[1]+scroll[1]
-        ex, ey = ending[0]+scroll[0], ending[1]+scroll[1]
+        sx, sy = starting[0]+self.editor.world.scroll[0], starting[1]+self.editor.world.scroll[1]
+        ex, ey = ending[0]+self.editor.world.scroll[0], ending[1]+self.editor.world.scroll[1]
 
         return (
             self.position[0] > sx and
