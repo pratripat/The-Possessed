@@ -6,7 +6,7 @@ class Door:
         self.load_image(tilemap)
 
     def load_image(self, tilemap):
-        for tile in tilemap.tiles:
+        for tile in tilemap.entities:
             if tile['id'] == 'door':
                 self.image = tile['image']
                 break

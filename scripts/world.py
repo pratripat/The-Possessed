@@ -2,7 +2,7 @@ import math
 from settings import *
 from scripts.functions.camera import Camera
 from scripts.functions.renderer import Renderer
-from scripts.functions.tilemap import TileMap
+from scripts.functions.tilemap import Tilemap
 from scripts.functions.animation_handler import Animation_Handler
 from scripts.functions.entity_manager import Entity_Manager
 from scripts.functions.particle import Particle_System
@@ -47,15 +47,16 @@ class World:
         else:
             player_data = None
 
-        self.tilemap = TileMap(f'data/levels/{self.level_order[self.level]}.json')
-        self.tilemap.load_map()
+        self.tilemap = Tilemap(f'data/levels/{self.level_order[self.level]}.json')
+        self.tilemap.load()
         self.entity_manager = Entity_Manager(self, player_data=player_data)
         self.camera.set_target(self.entity_manager.player)
 
         self.particles.clear()
         self.projectiles.clear()
 
-        self.collidables = self.tilemap.get_tiles('ground')
+        self.collidables = self.tilemap.get_rects_with_id('ground')
+        rects = self.tilemap.get_concised_rects('ground', 0)
         self.game_time = 0
 
     def run(self):

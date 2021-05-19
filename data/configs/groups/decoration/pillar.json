@@ -1,0 +1,8 @@
+{
+  "id": "pillar",
+  "filename": "data/graphics/spritesheet/pillar.png",
+  "indexes": [0, 1, 2],
+  "resize": true,
+  "scale": 3,
+  "autotile_config": "data/configs/autotile/pillar_autotile_config.json"
+}
