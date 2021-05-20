@@ -79,6 +79,7 @@ class Entity_Manager:
                 if projectile.owner == self.player and not lootbox.opened:
                     if rect_rect_collision(projectile.rect, lootbox.rect):
                         lootbox.open(self.dropped_entities)
+                        break
 
         for entity in self.dropped_entities:
             entity.update(dt, gravity, collidables)

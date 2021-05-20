@@ -83,18 +83,18 @@ class Player(Entity):
             self.airtimer = 6
 
         #Sets the velocity of the player horizontally
-        if directions['left'] and (not self.attacking or self.airtimer > 3):
+        if directions['left'] and not directions['right'] and (not self.attacking or self.airtimer > 3):
             self.velocity[0] -= 1
             self.velocity[0] = max(-self.speed, self.velocity[0])
             self.flip(True)
             animation_state = 'run'
-        elif directions['right'] and (not self.attacking or self.airtimer > 3):
+        if directions['right'] and not directions['left'] and (not self.attacking or self.airtimer > 3):
             self.velocity[0] += 1
             self.velocity[0] = min(self.velocity[0], self.speed)
             self.flip(False)
             animation_state = 'run'
-        else:
-            self.velocity[0] = 0
+        if not directions['left'] and not directions['right']:
+            self.velocity[0] -= self.velocity[0] * 6 * dt
 
         #Gravity
         if directions['down']:

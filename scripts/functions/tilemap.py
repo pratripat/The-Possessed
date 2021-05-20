@@ -111,48 +111,6 @@ class Tilemap:
                 rects.append(rect)
         return rects
 
-    def get_concised_rects(self, id, layer=None):
-        def get_neighbors(position, positions):
-            neighbors = []
-            for dir, vector in {'n':(0,-1), 'e':(1,0), 'w':(-1,0), 's':(0,1)}.items():
-                pos = [position[0]+vector[0], position[1]+vector[1]]
-
-                if tuple(pos) in positions:
-                    neighbors.append(dir)
-
-            return neighbors
-
-        tiles = self.get_tiles_with_id(id, layer)
-
-        if layer == None:
-            tiles_data = {tuple(tile['position']):tile for tile in tiles}
-            tiles = [v for k, v in tiles_data.items()]
-
-        positions = [(tile['position'][0]//self.RES, tile['position'][1]//self.RES) for tile in tiles]
-        positions = list(set(positions))
-        positions.sort()
-
-        start_positions = []
-        rect_positions = {}
-
-        for position in positions:
-            neighbors = get_neighbors(position, positions)
-
-            if 'n' not in neighbors and 'w' not in neighbors:
-                start_positions.append(position)
-
-            if 's' not in neighbors and 'e' not in neighbors:
-                rect_positions[start_positions[0]] = [position[0]+1, position[1]+1]
-                start_positions.pop(0)
-
-        rects = []
-
-        for start_position, end_position in rect_positions.items():
-            rect = pygame.Rect(start_position[0]*self.RES, start_position[1]*self.RES, end_position[0]*self.RES-start_position[0]*self.RES, end_position[1]*self.RES-start_position[1]*self.RES)
-            rects.append(rect)
-
-        return rects
-
     #Removes a entity from given position and layer
     def remove_entity(self, pos, layer=None):
         for entity in self.entities[:]:

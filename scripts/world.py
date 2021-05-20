@@ -48,7 +48,6 @@ class World:
             player_data = None
 
         self.tilemap = Tilemap(f'data/levels/{self.level_order[self.level]}.json')
-        self.tilemap.load()
         self.entity_manager = Entity_Manager(self, player_data=player_data)
         self.camera.set_target(self.entity_manager.player)
 
@@ -56,7 +55,6 @@ class World:
         self.projectiles.clear()
 
         self.collidables = self.tilemap.get_rects_with_id('ground')
-        rects = self.tilemap.get_concised_rects('ground', 0)
         self.game_time = 0
 
     def run(self):
