@@ -13,7 +13,7 @@ class Weapon:
             offset = [0,0]
 
             if self.owner.flipped:
-                offset[0] += self.owner.image.get_width()
+                offset[0] += self.owner.image.get_width()/2
 
             self.animation.render(surface, [self.owner.position[0]-scroll[0]-offset[0], self.owner.position[1]-scroll[1]-offset[1]], self.owner.flipped, colorkey)
 

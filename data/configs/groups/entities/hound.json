@@ -1,0 +1,8 @@
+{
+  "id": "hound",
+  "filename": "data/graphics/spritesheet/hound.png",
+  "indexes": [0],
+  "resize": true,
+  "scale": 3,
+  "autotile_config": null
+}

@@ -9,7 +9,6 @@ def get_circle_surface(radius, color):
 
 class Renderer:
     def render(self, screen, font, tilemap, particles, entities, scroll, game_time):
-        rects = tilemap.get_concised_rects('ground', 0)
         rendered = False
         visible_tiles = ['ground', 'pillar', 'rock', 'torch']
         screen.fill((0,0,0))
@@ -39,7 +38,3 @@ class Renderer:
 
         particles.render(screen, scroll)
         entities.render_ui(screen, font)
-
-        for rect in rects:
-            pygame.draw.rect(screen, (255,0,0), (rect[0]-scroll[0], rect[1]-scroll[1], rect[2], rect[3]), 1)
-        # pygame.draw.rect(screen, (255,0,0), (rects[0][0]-scroll[0], rects[0][1]-scroll[1], rects[0][2], rects[0][3]), 1)
