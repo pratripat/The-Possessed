@@ -2,7 +2,8 @@ import pygame, json, random
 from .functions.dropped_item import Dropped_Item
 
 class LootBox:
-    def __init__(self, animations, position):
+    def __init__(self, game, animations, position):
+        self.game = game
         self.animations = [animations.get_animation('closed_lootbox'), animations.get_animation('open_lootbox')]
         self.position = position
         self.current_animation = self.animations[0]
@@ -16,18 +17,18 @@ class LootBox:
             for _ in range(json.load(open('data/configs/weapons/probability.json', 'r'))[weapon_id]):
                 self.weapons.append(weapon_id)
 
-    def render(self, surface, scroll):
-        self.current_animation.render(surface, [self.position[0]-scroll[0], self.position[1]-scroll[1]])
+    def render(self):
+        self.current_animation.render(self.game.screen, [self.position[0]-self.game.camera.scroll[0], self.position[1]-self.game.camera.scroll[1]])
 
-    def run(self, dt):
-        self.current_animation.run(dt)
+    def run(self):
+        self.current_animation.run(self.game.dt)
 
-    def open(self, dropped_entities):
+    def open(self):
         self.current_animation = self.animations[1]
         self.opened = True
 
         for i in range(2):
-            dropped_entities.append(Dropped_Item(random.choice(self.weapons), self.center, [(i*2-1)*50, -10]))
+            self.game.entity_manager.dropped_entities.append(Dropped_Item(random.choice(self.weapons), self.center, [(i*2-1)*50, -10]))
 
     @property
     def rect(self):

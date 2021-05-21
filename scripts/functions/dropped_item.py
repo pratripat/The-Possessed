@@ -13,7 +13,7 @@ class Dropped_Item:
         surface.blit(self.image, [self.position[0]-scroll[0], self.position[1]-scroll[1]])
 
     def update(self, dt, gravity, rects):
-        self.velocity[1] += gravity
+        self.velocity[1] += 1
 
         self.position[0] += round(self.velocity[0]*dt*80)
         hit_list = self.get_colliding_objects(rects)

@@ -1,4 +1,4 @@
-from settings import *
+import pygame
 
 def load_images_from_spritesheet(filename):
     #Tries to load the file
@@ -36,7 +36,7 @@ def load_images_from_spritesheet(filename):
                         break
 
                 image = pygame.Surface((width, height))
-                image.set_colorkey(colors['black'])
+                image.set_colorkey((0,0,0))
                 image.blit(spritesheet, (-start_position[0], -start_position[1]))
 
                 images.append(image)

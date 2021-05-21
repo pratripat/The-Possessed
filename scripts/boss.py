@@ -17,7 +17,7 @@ class Boss(Entity):
     def run(self, dt, gravity):
         self.update(dt)
         if not self.is_dead:
-            self.movement(gravity)
+            self.movement(1)
 
             if self.invincible_timer > 0:
                 self.invincible_timer -= 1
@@ -45,7 +45,7 @@ class Boss(Entity):
             self.velocity[0] = 0
 
         if self.directions['down']:
-            self.velocity[1] += gravity
+            self.velocity[1] += 1
 
         #Limiting velocity
         self.velocity[1] = min(8, self.velocity[1])
