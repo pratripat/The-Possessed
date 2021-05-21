@@ -1,7 +1,7 @@
-from scripts.world import World
+from scripts.game import Game
 
 def main():
-    world = World()
-    world.main_loop()
+    game = Game()
+    game.main_loop()
 
 main()

@@ -1,5 +1,4 @@
-import math
-from settings import *
+import pygame, json, math, sys
 from scripts.functions.camera import Camera
 from scripts.functions.renderer import Renderer
 from scripts.functions.tilemap import Tilemap
@@ -9,12 +8,22 @@ from scripts.functions.particle import Particle_System
 from scripts.functions.font_renderer import Font
 from scripts.functions.select_skill_menu import Select_skill_menu
 
-class World:
+class Game:
     def __init__(self):
+        pygame.init()
+
+        self.screen = pygame.display.set_mode((1000, 700), pygame.RESIZABLE)
+        self.screen.set_colorkey((0,0,0))
+        pygame.display.set_caption('Platformer')
+
+        self.clock = pygame.time.Clock()
+
+        self.gravity = 1
+
         self.animation_handler = Animation_Handler()
         self.particles = Particle_System()
-        self.renderer = Renderer()
-        self.camera = Camera()
+        self.renderer = Renderer(self)
+        self.camera = Camera(self)
         self.camera.set_movement(0.05)
         self.font = Font('data/graphics/spritesheet/character_spritesheet')
 
@@ -27,7 +36,7 @@ class World:
 
     @property
     def dt(self):
-        fps = clock.get_fps()
+        fps = self.clock.get_fps()
 
         if fps != 0:
             return 1/fps
@@ -58,13 +67,13 @@ class World:
         self.game_time = 0
 
     def run(self):
-        clock.tick(60)
+        self.clock.tick(60)
 
         self.game_time += self.dt
 
-        self.camera.update(screen)
+        self.camera.update()
 
-        self.entity_manager.run(screen, self.camera.scroll, self.collidables, self.projectiles, self.particles, self.dt, gravity)
+        self.entity_manager.run(self.screen, self.camera.scroll, self.collidables, self.projectiles, self.particles, self.dt, 1)
         self.particles.run()
 
         for projectile in self.projectiles[:]:
@@ -73,7 +82,7 @@ class World:
             if projectile.destroyed:
                 self.projectiles.remove(projectile)
 
-        self.renderer.render(screen, self.font, self.tilemap, self.particles, self.entity_manager, self.camera.scroll, self.game_time)
+        self.renderer.render()
 
         pygame.display.update()
 
@@ -115,22 +124,22 @@ class World:
                     self.entity_manager.drop_player_item()
 
                 if event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                    directions['left'] = True
+                    self.entity_manager.player.directions['left'] = True
                 if event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                    directions['right'] = True
+                    self.entity_manager.player.directions['right'] = True
                 if event.key == pygame.K_w or event.key == pygame.K_UP or event.key == pygame.K_SPACE:
-                    directions['up'] = True
-                    directions['down'] = False
+                    self.entity_manager.player.directions['up'] = True
+                    self.entity_manager.player.directions['down'] = False
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                    directions['left'] = False
+                    self.entity_manager.player.directions['left'] = False
                 if event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                    directions['right'] = False
+                    self.entity_manager.player.directions['right'] = False
                 if event.key == pygame.K_w or event.key == pygame.K_UP or event.key == pygame.K_SPACE:
-                    directions['up'] = False
-                    directions['down'] = True
+                    self.entity_manager.player.directions['up'] = False
+                    self.entity_manager.player.directions['down'] = True
             if event.type == pygame.VIDEORESIZE:
-                screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
+                self.screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
 
     #Starts the game
     def main_loop(self):

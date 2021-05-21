@@ -1,4 +1,4 @@
-import pygame, copy
+import pygame
 from .funcs import *
 from scripts.player import Player
 from scripts.demon import Demon
@@ -9,44 +9,48 @@ from scripts.octo import Octo
 from scripts.eye import Eye
 
 class Entity_Manager:
-    def __init__(self, world, player_data=None, final_level=False):
-        self.world = world
+    def __init__(self, game, player_data=None, final_level=False):
+        self.game = game
         self.level_transition = pygame.mixer.Sound('data/sfx/level_transition.wav')
-        self.player = Player(self.world.animation_handler, self.get_entity(self.world.tilemap, 'player')[0], player_data)
-        self.enemies = [Demon(self.world.animation_handler, position) for position in self.get_entity(self.world.tilemap, 'demon')] + [Hound(self.world.animation_handler, position) for position in self.get_entity(self.world.tilemap, 'hound')]
-        self.loot_boxes = [LootBox(self.world.animation_handler, position) for position in self.get_entity(self.world.tilemap, 'lootbox')]
+        self.player = Player(self.game, self.game.animation_handler, self.get_entity(self.game.tilemap, 'player')[0], player_data)
+        self.enemies = [Demon(self.game, self.game.animation_handler, position) for position in self.get_entity(self.game.tilemap, 'demon')] + [Hound(self.game, self.game.animation_handler, position) for position in self.get_entity(self.game.tilemap, 'hound')]
+        self.loot_boxes = [LootBox(self.game, self.game.animation_handler, position) for position in self.get_entity(self.game.tilemap, 'lootbox')]
         self.dropped_entities = []
         self.boss = None
         self.end_level_delay = 2
 
         try:
-            self.door = Door(self.get_entity(self.world.tilemap, 'door')[0], self.world.tilemap)
+            self.door = Door(self.get_entity(self.game.tilemap, 'door')[0], self.game.tilemap)
         except:
             if not final_level:
                 boss_ids = ['octo', 'eye']
-                bosses = [Octo(self.world.camera, self.world.animation_handler, [0,0]), Eye(self.world.animation_handler, [0,0])]
+                bosses = [Octo(self.game.camera, self.game.animation_handler, [0,0]), Eye(self.game.animation_handler, [0,0])]
                 for i, id in enumerate(boss_ids):
                     try:
-                        position = self.get_entity(self.world.tilemap, id)[0]
+                        position = self.get_entity(self.game.tilemap, id)[0]
                         self.boss = bosses[i]
                         self.boss.position = position
-                    except:
+                    except Exception as e:
                         continue
 
             self.door = None
 
     def run(self, surface, scroll, collidables, projectiles, particles, dt, gravity):
+        if self.player.health == 0:
+            self.game.load_level(self.game.level)
+            return
+
         enemies = self.enemies.copy()
 
         if self.boss:
             enemies.append(self.boss)
 
         for loot_box in self.loot_boxes:
-            loot_box.run(dt)
+            loot_box.run()
 
         for enemy in self.enemies[:]:
             enemy.move(collidables, dt)
-            enemy.run(scroll, dt, self.player)
+            enemy.run()
             enemy.attacks(self.player, projectiles)
 
             if enemy.dead():
@@ -54,11 +58,11 @@ class Entity_Manager:
                 particles.add_particle(enemy.center, [0,0], size=10, decrementation=0.2, color=(41,43,48), intensity=5, number=20, collidables=collidables)
 
         self.player.move(collidables, dt)
-        self.player.run(dt, particles)
-        self.player.attacks(enemies, projectiles)
+        self.player.run()
+        self.player.attacks(enemies)
 
         if self.boss:
-            self.boss.run(dt, gravity, projectiles, self.player)
+            self.boss.run(dt, 1, projectiles, self.player)
             self.boss.move(collidables, dt)
 
             if self.boss.dead():
@@ -66,7 +70,7 @@ class Entity_Manager:
                     self.end_level_delay -= dt
                     return
 
-                self.world.skill_menu.run(surface)
+                self.game.skill_menu.run(surface)
                 self.finish_level()
 
         if self.door:
@@ -78,15 +82,15 @@ class Entity_Manager:
             for lootbox in self.loot_boxes:
                 if projectile.owner == self.player and not lootbox.opened:
                     if rect_rect_collision(projectile.rect, lootbox.rect):
-                        lootbox.open(self.dropped_entities)
+                        lootbox.open()
                         break
 
         for entity in self.dropped_entities:
-            entity.update(dt, gravity, collidables)
+            entity.update(dt, 1, collidables)
 
     def render(self, surface, scroll):
         for loot_box in self.loot_boxes:
-            loot_box.render(surface, scroll)
+            loot_box.render()
 
         for enemy in self.enemies:
             enemy.render(surface, scroll, (0,0,0))
@@ -94,10 +98,10 @@ class Entity_Manager:
         if self.door:
             self.door.render(surface, scroll)
 
-        self.player.render(surface, scroll, (0,0,0))
-
         if self.boss:
             self.boss.render(surface, scroll)
+
+        self.player.render()
 
         for entity in self.dropped_entities:
             entity.render(surface, scroll)
@@ -133,5 +137,5 @@ class Entity_Manager:
         self.player.load_weapon()
 
     def finish_level(self):
-        self.world.level += 1
-        self.world.load_level(self.world.level)
+        self.game.level += 1
+        self.game.load_level(self.game.level)

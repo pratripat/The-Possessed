@@ -1,10 +1,11 @@
-from settings import *
+import pygame
 from .functions.entity import Entity
 from .functions.projectile import Projectile
 
 class Hound(Entity):
-    def __init__(self, animations, position):
+    def __init__(self, game, animations, position):
         super().__init__(animations, 'hound', position, False, 'idle')
+        self.game = game
         self.directions = {k : False for k in ['up', 'right', 'down', 'left']}
         self.speed = 6
         self.health = 100
@@ -15,21 +16,21 @@ class Hound(Entity):
         self.active = False
 
     #Updates and moves the hound towards the player
-    def run(self, scroll, dt, player):
+    def run(self):
         self.directions['down'] = True
         if self.movement_timer <= 0:
-            self.move_towards_player(scroll, player)
+            self.move_towards_player()
             self.movement()
 
-        self.update(dt)
+        self.update(self.game.dt)
 
         if self.invincible_timer > 0:
             self.invincible_timer -= 1
 
         if self.active:
-            if player.center[0] < self.center[0]:
+            if self.game.entity_manager.player.center[0] < self.center[0]:
                 self.flip(False)
-            elif player.center[0] > self.center[0]:
+            elif self.game.entity_manager.player.center[0] > self.center[0]:
                 self.flip(True)
 
         if self.movement_timer > 0:
@@ -55,7 +56,7 @@ class Hound(Entity):
 
         #Gravity only (hounds do not jump in this game)
         if self.directions['down']:
-            self.velocity[1] += gravity
+            self.velocity[1] += 1
 
         #Limiting velocity
         self.velocity[1] = min(8, self.velocity[1])
@@ -71,23 +72,23 @@ class Hound(Entity):
 
         self.set_animation(animation_state)
 
-    #Sets movement towards the player if the hound is on screen
-    def move_towards_player(self, scroll, player):
+    #Sets movement towards the player if the demon is on screen
+    def move_towards_player(self):
         self.active = False
-        if not self.invincible_timer > 0 and self.on_screen(scroll, player) and not player.invisible:
+        if not self.invincible_timer > 0 and self.on_screen() and not self.game.entity_manager.player.invisible:
             self.active = True
-            if player.center[0] < self.center[0]:
+            if self.game.entity_manager.player.position[0] < self.position[0]:
                 self.directions['left'] = True
-            elif player.center[0] > self.center[0]:
+            elif self.game.entity_manager.player.position[0] > self.position[0]:
                 self.directions['right'] = True
 
-    #Returns if hound can be seen by the player
-    def on_screen(self, scroll, player):
+    #Returns if demon can be seen by the player
+    def on_screen(self):
         return (
-            abs(self.center[0]-player.center[0]) < 900 and
-            abs(self.center[1]-player.center[1]) < 900 and
-            self.center[0]-scroll[0] > 0 and self.center[0]-scroll[0] < screen.get_width() and
-            self.center[1]-scroll[1] > 0 and self.center[1]-scroll[1] < screen.get_height()
+            abs(self.center[0]-self.game.entity_manager.player.center[0]) < 900 and
+            abs(self.center[1]-self.game.entity_manager.player.center[1]) < 900 and
+            self.center[0]-self.game.camera.scroll[0] > 0 and self.center[0]-self.game.camera.scroll[0] < self.game.screen.get_width() and
+            self.center[1]-self.game.camera.scroll[1] > 0 and self.center[1]-self.game.camera.scroll[1] < self.game.screen.get_height()
         )
 
     #Reduces health

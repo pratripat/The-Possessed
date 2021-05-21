@@ -150,7 +150,7 @@ class Octo(Boss):
                 self.blobs.remove(blob)
 
     def run(self, dt, gravity, projectiles, player):
-        super().run(dt, gravity)
+        super().run(dt, 1)
 
         for blob in self.blobs:
             blob.update(dt, projectiles, self, player)
