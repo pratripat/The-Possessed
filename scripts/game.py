@@ -23,7 +23,7 @@ class Game:
         self.animation_handler = Animation_Handler()
         self.particles = Particle_System()
         self.renderer = Renderer(self)
-        self.camera = Camera(self)
+        self.camera = Camera()
         self.camera.set_movement(0.05)
         self.font = Font('data/graphics/spritesheet/character_spritesheet')
 
@@ -33,6 +33,7 @@ class Game:
         self.load_level(self.level)
 
         self.skill_menu = Select_skill_menu(self.font, self.entity_manager.player.skill_manager)
+        self.game_over = False
 
     @property
     def dt(self):
@@ -51,9 +52,9 @@ class Game:
             pygame.mixer.music.load('data/music/game_music.wav')
             pygame.mixer.music.play(-1)
 
-        if self.level >= 1:
-            player_data = self.entity_manager.player.get_data()
-        else:
+        try:
+            player_data = self.previous_player_data
+        except:
             player_data = None
 
         self.tilemap = Tilemap(f'data/levels/{self.level_order[self.level]}.json')
@@ -66,12 +67,14 @@ class Game:
         self.collidables = self.tilemap.get_rects_with_id('ground')
         self.game_time = 0
 
+        self.previous_player_data = self.entity_manager.player.get_data()
+
     def run(self):
         self.clock.tick(60)
 
         self.game_time += self.dt
 
-        self.camera.update()
+        self.camera.update(self.screen, [[self.tilemap.left, self.tilemap.right], [self.tilemap.top, self.tilemap.bottom]])
 
         self.entity_manager.run(self.screen, self.camera.scroll, self.collidables, self.projectiles, self.particles, self.dt, 1)
         self.particles.run()
@@ -146,3 +149,7 @@ class Game:
         while True:
             self.event_loop()
             self.run()
+
+            if self.game_over:
+                self.load_level(self.level)
+                self.game_over = False

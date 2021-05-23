@@ -13,12 +13,12 @@ class Renderer:
 
     def render(self):
         rendered = False
-        visible_tiles = ['ground', 'pillar', 'rock', 'torch']
+        visible_tiles = ['ground', 'pillar', 'rock', 'torch', 'door']
         self.game.screen.fill((0,0,0))
 
         for tile in self.game.tilemap.entities:
             if tile['layer'] == 0 and not rendered:
-                self.game.entity_manager.render(self.game.screen, self.game.camera.scroll)
+                self.game.entity_manager.render()
                 rendered = True
 
             if tile['id'] in visible_tiles:
@@ -53,4 +53,4 @@ class Renderer:
 
         self.game.screen.blit(purple_surf, (0,0), special_flags=pygame.BLEND_RGBA_ADD)
 
-        self.game.entity_manager.render_ui(self.game.screen, self.game.font)
+        self.game.entity_manager.render_ui()

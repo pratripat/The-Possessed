@@ -24,7 +24,7 @@ class Entity_Manager:
         except:
             if not final_level:
                 boss_ids = ['octo', 'eye']
-                bosses = [Octo(self.game.camera, self.game.animation_handler, [0,0]), Eye(self.game.animation_handler, [0,0])]
+                bosses = [Octo(self.game.camera, self.game.animation_handler, [0,0]), Eye(self.game, self.game.animation_handler, [0,0])]
                 for i, id in enumerate(boss_ids):
                     try:
                         position = self.get_entity(self.game.tilemap, id)[0]
@@ -36,10 +36,6 @@ class Entity_Manager:
             self.door = None
 
     def run(self, surface, scroll, collidables, projectiles, particles, dt, gravity):
-        if self.player.health == 0:
-            self.game.load_level(self.game.level)
-            return
-
         enemies = self.enemies.copy()
 
         if self.boss:
@@ -88,36 +84,39 @@ class Entity_Manager:
         for entity in self.dropped_entities:
             entity.update(dt, 1, collidables)
 
-    def render(self, surface, scroll):
+        if self.player.health == 0:
+            self.game.game_over = True
+
+    def render(self):
         for loot_box in self.loot_boxes:
             loot_box.render()
 
         for enemy in self.enemies:
-            enemy.render(surface, scroll, (0,0,0))
+            enemy.render(self.game.screen, self.game.camera.scroll, (0,0,0))
 
         if self.door:
-            self.door.render(surface, scroll)
+            self.door.render(self.game.screen, self.game.camera.scroll)
 
         if self.boss:
-            self.boss.render(surface, scroll)
+            self.boss.render(self.game.screen, self.game.camera.scroll)
 
         self.player.render()
 
         for entity in self.dropped_entities:
-            entity.render(surface, scroll)
+            entity.render(self.game.screen, self.game.camera.scroll)
 
-    def render_ui(self, surface, font):
+    def render_ui(self):
         if self.boss:
-            self.boss.health_bar.position[0] = surface.get_width()/2-self.boss.health_bar.dimensions[0]/2
-            self.boss.health_bar.render(surface, self.boss.health, (171,108,132))
+            self.boss.health_bar.position[0] = self.game.screen.get_width()/2-self.boss.health_bar.dimensions[0]/2
+            self.boss.health_bar.render(self.game.screen, self.boss.health, (194,62,110))
 
-        self.player.health_bar.position[1] = surface.get_height()-self.player.health_bar.dimensions[1]-10
-        self.player.health_bar.render(surface, self.player.health, (171,108,132), [20,0])
-        self.player.skill_manager.render_skills(surface, font)
+        self.player.health_bar.position[1] = self.game.screen.get_height()-self.player.health_bar.dimensions[1]-10
+        self.player.health_bar.render(self.game.screen, self.player.health, (194,62,110), [20,0])
+        self.player.skill_manager.render_skills(self.game.screen, self.game.font)
 
         self.player.inventory.position[0] = self.player.health_bar.position[0]+self.player.health_bar.dimensions[0]+10
-        self.player.inventory.position[1] = surface.get_height()-self.player.inventory.size-10
-        self.player.inventory.render(surface)
+        self.player.inventory.position[1] = self.game.screen.get_height()-self.player.inventory.size-10
+        self.player.inventory.render(self.game.screen)
 
     def get_entity(self, tilemap, id):
         rects = tilemap.get_rects_with_id(id)

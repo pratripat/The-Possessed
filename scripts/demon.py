@@ -4,11 +4,11 @@ from scripts.functions.projectile import Projectile
 
 class Demon(Entity):
     def __init__(self, game, animations, position):
-        self.game = game
         super().__init__(animations, 'demon', position, False, 'idle')
+        self.game = game
         self.directions = {k : False for k in ['up', 'right', 'down', 'left']}
         self.speed = 2
-        self.health = 100
+        self.health = 50
         self.attack_damage = 10
         self.movement_timer = 30
         self.invincible_timer = 0
